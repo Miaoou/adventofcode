@@ -6,8 +6,10 @@
 #include <algorithm>
 #include <cstdlib>
 #include <iterator>
+#include <set>
 
 using namespace std;
+
 
 string const in_s =
 "6046 6349 208 276 4643 1085 1539 4986 7006 5374 252 4751 226 6757 7495 2923\n"
@@ -26,6 +28,35 @@ string const in_s =
 "458 448 324 235 69 79 94 78 515 68 380 64 440 508 503 452\n"
 "198 216 5700 4212 2370 143 5140 190 4934 539 5054 3707 6121 5211 549 2790\n"
 "3021 3407 218 1043 449 214 1594 3244 3097 286 114 223 1214 3102 257 3345";
+
+uint32_t
+part2( istringstream& in ) {
+    uint32_t sum = 0;
+
+    string line;
+    while( getline( in, line ) ) {
+        istringstream line_stream( line );
+        set< uint32_t, greater< uint32_t > > numbers(
+                ( istream_iterator< uint32_t >( line_stream ) ),
+                istream_iterator< uint32_t >()
+                );
+
+        uint32_t rest = 0;
+        for( auto it_curr = begin( numbers ); it_curr != end( numbers ); ++it_curr ) {
+            auto it_next = it_curr;
+            ++it_next;
+            for( ; it_next != end( numbers ); ++it_next ) {
+                if( *it_curr % *it_next == 0 ) {
+                    rest = *it_curr / *it_next;
+                    break;
+                }
+            }
+        }
+        
+        sum += rest;
+    }
+    return sum;
+}
 
 uint32_t
 part1( istringstream& in ) {
@@ -50,7 +81,9 @@ part1( istringstream& in ) {
 int
 main() {
     istringstream in( in_s );
-    auto sum = part1( in );
+
+    //auto sum = part1( in );
+    auto sum = part2( in );
 
     cout << sum << "\n";
     return 0;
