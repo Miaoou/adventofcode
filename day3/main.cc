@@ -14,9 +14,7 @@
 using namespace std;
 
 uint32_t
-part1() {
-    auto constexpr n = 23;
-
+part1( uint32_t n ) {
     if (n == 1)
         return 0;
     
@@ -35,32 +33,34 @@ part1() {
     auto bot_left = top_left + nb_full_lines + 1; // 21
     auto bot_right = bot_left + nb_full_lines + 1; // 25
 
-    auto curr_case = nb_full_lines - 1;
+    auto curr_case = nb_full_lines + 1;
+    bool decrement = true;
+
     for (auto i = last_corner + 1; i <= n; ++i) {
-        if (i == top_right || i == top_left || i == bot_left || i == bot_right)
-            curr_case = 0;
-        else
-            i <= ( ( nb_full_lines + 1 ) / 2 ) ? --curr_case : ++curr_case;
+        if (i == top_right || i == top_left || i == bot_left || i == bot_right) {
+            curr_case = nb_full_lines + 1;
+            decrement = true;
+        }
+        else {
+            if (curr_case == ((nb_full_lines + 1) / 2)) {
+                decrement = false;
+            }
+
+            decrement ? --curr_case : ++curr_case;
+        }        
     }
 
-    if (n == top_right || n == top_left || n == bot_left || n == bot_right)
-        curr_case = 0;
+    return curr_case;
 
-    if (curr_case == 0)
-        return (nb_full_lines + 1);
-    else
-        return curr_case;
-    
-
-
-    return 0;
 }
 
 int
 main() {
-    auto dist = part1();
+    cout << "3:" << part1(12) << "\n";
+    cout << "2:" << part1(23) << "\n";
+    cout << "31:" << part1(1024) << "\n";
+    cout << "326:" << part1(361527) << "\n";
 
-    cout << dist << "\n";
     system("pause");
     return 0;
 }
