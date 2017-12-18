@@ -30,9 +30,21 @@ part1() {
     return steps;
 }
 
+uint32_t
+part2() {
+    uint32_t steps = 0;
+    ifstream ifs( "input.txt" );
+    vector< int32_t > data( istream_iterator< int32_t >( ifs ), {} );
+
+    for( auto p = begin( data ); p != end( data ); ++steps )
+        p += ( ( *p ) >= 3 ) ? ( *p )-- : ( *p )++;
+
+    return steps;
+}
+
 int
 main() {
-    cout << part1();
+    cout << part2();
 
     return 0;
 }
