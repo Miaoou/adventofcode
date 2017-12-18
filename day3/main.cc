@@ -12,6 +12,7 @@
 #include <cstdlib>
 #include <vector>
 #include <optional>
+#include <memory>
 
 using namespace std;
 
@@ -57,26 +58,28 @@ part1( uint32_t n ) {
 }
 
 size_t
-part2( size_t n ) {
+part2() {
+    static size_t const max_size = 100;
     struct coords {
-        using v_coord_t = vector< std::optional< size_t > >;
-        vector< v_coord_t > px_py{ 40, v_coord_t( 40 ) };
-        vector< v_coord_t > mx_py{ 40, v_coord_t( 40 ) };
-        vector< v_coord_t > mx_my{ 40, v_coord_t( 40 ) };
-        vector< v_coord_t > px_my{ 40, v_coord_t( 40 ) };
+        using v_coord_t = array< std::optional< size_t >, max_size >;
+        array< v_coord_t, max_size > px_py;
+        array< v_coord_t, max_size > mx_py;
+        array< v_coord_t, max_size > mx_my;
+        array< v_coord_t, max_size > px_my;
     };
-    coords c;
-    c.px_py[0][0] = 1;
+    optional< size_t > first_match;
+    auto c = make_unique< coords >();
+    c->px_py[0][0] = 1;
 
-    auto& get_coords_v = [&c] ( int32_t x, int32_t y ) {
+    auto get_coords_v = [&c] ( int32_t x, int32_t y ) -> auto& {
         if( x < 0 && y >= 0 )
-            return c.mx_py;
+            return c->mx_py;
         if( x >= 0 && y < 0 )
-            return c.px_my;
+            return c->px_my;
         if( x < 0 && y < 0 )
-            return c.mx_my;
+            return c->mx_my;
       
-        return c.px_py;
+        return c->px_py;
     };
 
     auto update_val_from = [&get_coords_v] ( size_t& val, int32_t x, int32_t y ) {
@@ -86,7 +89,7 @@ part2( size_t n ) {
             val += tmp.value();
     };
 
-    auto update_val = [&get_coords_v, &update_val_from] ( int32_t x, int32_t y ) {
+    auto update_val = [&get_coords_v, &update_val_from, &first_match] ( int32_t x, int32_t y ) {
         size_t val = 0;
         update_val_from( val, x - 1, y - 1 );
         update_val_from( val, x - 1, y );
@@ -99,10 +102,12 @@ part2( size_t n ) {
 
         auto& coords_v = get_coords_v( x, y );
         coords_v[abs( x )][abs( y )] = val;
+
+        if( val > 361527 && !first_match.has_value() )
+            first_match = val;
     };
 
     auto fill_next_lines = [&update_val] ( int32_t curr_nb_lines ) {
-        optional< size_t > first_match;
         int32_t x = curr_nb_lines;
         int32_t y = 1 - curr_nb_lines;
 
@@ -114,14 +119,12 @@ part2( size_t n ) {
             update_val( x, y );
         for( ; x <= curr_nb_lines; ++x )
             update_val( x, y );        
-
-        return first_match;
     };
 
-    optional< size_t > first_match;
+
 
     for( size_t curr_nb_lines = 1; !first_match.has_value(); ++curr_nb_lines ) {
-        first_match = fill_next_lines( curr_nb_lines );
+        fill_next_lines( curr_nb_lines );
     }   
 
     return first_match.value();
@@ -129,8 +132,7 @@ part2( size_t n ) {
 
 int
 main() {
-    cout << part2( 24 );
+    cout << part2();
 
-    system("pause");
     return 0;
 }
