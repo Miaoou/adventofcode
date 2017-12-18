@@ -55,9 +55,49 @@ part1() {
     return cycles;
 }
 
+uint32_t
+part2() {
+    ifstream ifs( "C:\\code\\adventofcode\\day6\\input.txt" );
+    //vector< uint32_t > banks{ 0, 2, 7, 0 };
+    vector< uint32_t > banks( istream_iterator< uint32_t >( ifs ), {} );
+    vector< vector< uint32_t > > states{ banks };
+    bool loop_detected = false;
+    uint32_t idx_found = 0;
+
+    auto find_state = [&states, &idx_found] ( vector< uint32_t > const& curr_state ) {
+        idx_found = 0;
+        for( auto const& state : states ) {
+            if( equal( begin( state ), end( state ), begin( curr_state ) ) )
+                return true;
+            ++idx_found;
+        }
+        return false;
+    };
+
+    uint32_t cycles = 0;
+
+    while( !loop_detected ) {
+        auto e = max_element( begin( banks ), end( banks ) );
+        auto max_bank = *e;
+        *e = 0;
+
+        for( auto p = e + 1; max_bank != 0; --max_bank, ++p ) {
+            if( p == end( banks ) )
+                p = begin( banks );
+
+            ++( *p );
+        }
+
+        loop_detected = find_state( banks );
+        states.push_back( banks );
+        ++cycles;
+    }
+    return cycles - idx_found;
+}
+
 int
 main() {
-    cout << part1();
+    cout << part2();
     system( "pause" );
     return 0;
 }
