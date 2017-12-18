@@ -14,6 +14,7 @@
 #include <optional>
 #include <memory>
 #include <fstream>
+#include <numeric>
 
 using namespace std;
 
@@ -39,10 +40,32 @@ part1() {
     return nb_valid;
 }
 
+uint32_t
+part2() {
+    uint32_t nb_valid = 0;
+    ifstream ifs("input");
+    string line;
+
+    while( getline( ifs, line ) ) {
+        set< string > words;
+        istringstream sline( line );
+
+        bool valid = true;
+        for( string word; sline >> word; ) {
+            sort( begin( word ), end( word ) );
+            if( !words.insert( word ).second )
+                valid = false;
+        }
+
+        nb_valid += valid ? 1 : 0;
+    }
+
+    return nb_valid;
+}
 
 int
 main() {
-    cout << part1();
+    cout << part2();
 
     return 0;
 }
